@@ -13,7 +13,7 @@ struct PID {
 
 double pid_control(PID &pid, double error);
 static void Capture(void); 
-static void motor_cntrol(int Lsensor_count , int Rsensor_count);
+static void motor_cntrol(double left_motor_speed , double right_motor_speed);
 
 PID pid = {0.1, 0, 0, 0, 0}; 
 
@@ -84,15 +84,17 @@ static void Capture(void){
         double error = frame_center - cX;
         double control = pid_control(pid, error);
 
+        double base_speed = 75;
+
         // フィードバック制御のためのモータ制御（仮想）
-        double left_motor_speed = 100 - control;
-        double right_motor_speed = 100 + control;
+        double left_motor_speed = base_speed - control;
+        double right_motor_speed = base_speed + control;
 
         // モータ速度を表示（実際のロボットではここでモータ制御関数を呼び出す）
         std::cout << "Left Motor: " << left_motor_speed << ", Right Motor: " << right_motor_speed << std::endl;
     }
 
-    motor_cntrol(Lsensor_count , Rsensor_count);
+    motor_cntrol(left_motor_speed , right_motor_speed);
     cv::imshow("Frame", frame);
     cv::waitKey(1);
     camera.release();
@@ -108,22 +110,10 @@ double pid_control(PID &pid, double error) {
 }
 
 /* 走行モータ制御 */
-static void motor_cntrol(int Lsensor_count ,int Rsensor_count){
-    int error = Lsensor_count - Rsensor_count;
-    double control_signal = pid_control(pid, error);
-
-    // 基準速度
-    double base_speed = 75;
-
-    // 左右のモータ速度の調整
-    double left_motor_speed = base_speed - control_signal;
-    double right_motor_speed = base_speed + control_signal;
-
+static void motor_cntrol(double left_motor_speed , double right_motor_speed){
     // モータ速度を0から100の範囲に制限
     left_motor_speed = std::min(left_motor_speed, 100.0);
     right_motor_speed = std::min(right_motor_speed, 100.0);
-
-    std::cout << "Left Motor Speed: " << left_motor_speed << ", Right Motor Speed: " << right_motor_speed << std::endl;
 
     // 実際のモータ制御関数をここで呼び出す
     ev3_motor_set_power(left_motor, left_motor_speed);
