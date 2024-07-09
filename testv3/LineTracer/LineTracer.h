@@ -1,5 +1,4 @@
 #pragma once
-
 #include <opencv2/opencv.hpp>
 
 #ifdef __cplusplus
@@ -27,9 +26,6 @@ constexpr int ALLB_Y2 = TRIMH;
 
 /* ステアリング操舵量の係数 */
 constexpr float STEERING_COEF = 0.2F;
-
-/* 走行基準スピード */
-constexpr double BASE_SPEED = 80;
 
 #ifdef __cplusplus
 }

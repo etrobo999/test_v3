@@ -1,5 +1,4 @@
 #include "app.h"
-#include <opencv2/opencv.hpp>
 #include <stdio.h>
 
 /* メインタスク(起動時にのみ関数コールされる) */

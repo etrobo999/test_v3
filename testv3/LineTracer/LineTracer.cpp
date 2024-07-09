@@ -76,16 +76,17 @@ static void Capture(void){
         // エラーベースのPID制御
         double error = frame_center - cX;
         double control = pid_control(pid, error);
-        double left_motor_speed = BASE_SPEED;
-        double right_motor_speed = BASE_SPEED;
+        double BASE_SPEED = 80.0;
+        double left_motor_speed;
+        double right_motor_speed;
         // フィードバック制御のためのモータ制御（仮想）
         if (control > 0) {
-            left_motor_speed = left_motor_speed + control * 2;
+            left_motor_speed = BASE_SPEED + control * 2;
         } else if (control < 0) {
-            right_motor_speed = right_motor_speed + control * 2;
+            right_motor_speed = BASE_SPEED + control * 2;
         } else {
-            left_motor_speed = left_motor_speed - control;
-            right_motor_speed = right_motor_speed + control;
+            left_motor_speed = BASE_SPEED - control;
+            right_motor_speed = BASE_SPEED + control;
 
         }
         // モータ速度を表示（実際のロボットではここでモータ制御関数を呼び出す）
