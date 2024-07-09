@@ -10,7 +10,6 @@ struct PID {
     double Kp, Ki, Kd;
     double previous_error, integral;
 };
-
 double pid_control(PID &pid, double error);
 static void Capture(void); 
 static void motor_cntrol(double left_motor_speed , double right_motor_speed);
@@ -84,15 +83,16 @@ static void Capture(void){
         // エラーベースのPID制御
         double error = frame_center - cX;
         double control = pid_control(pid, error);
-
+        double left_motor_speed;
+        double right_motor_speed;
         // フィードバック制御のためのモータ制御（仮想）
         if (control > 0) {
-            double left_motor_speed = BASE_SPEED - control * 2;
+            left_motor_speed = BASE_SPEED - control * 2;
         } else if (control < 0) {
-            double right_motor_speed = BASE_SPEED + control * 2;
+            right_motor_speed = BASE_SPEED + control * 2;
         } else {
-            double left_motor_speed = BASE_SPEED - control;
-            double right_motor_speed = BASE_SPEED + control;
+            left_motor_speed = BASE_SPEED - control;
+            right_motor_speed = BASE_SPEED + control;
 
         }
         // モータ速度を表示（実際のロボットではここでモータ制御関数を呼び出す）
