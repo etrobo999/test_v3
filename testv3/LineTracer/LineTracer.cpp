@@ -21,13 +21,6 @@ cv::VideoCapture camera;
 /* ライントレースタスク(50msec周期で関数コールされる) */
 void tracer_task(intptr_t unused) {
     Capture();
-    if (kbhit()) {
-        int ch = getch();
-        if (ch == 'q') {
-            release_camera() 
-            stop_line_tracer_task();
-        }
-    }
     /* タスク終了 */
     ext_tsk();
 }
@@ -103,7 +96,6 @@ static void Capture(void){
 
     cv::imshow("Frame", frame);
     cv::waitKey(1);
-    camera.release();
     return;
     
 }
@@ -128,13 +120,4 @@ double pid_control(PID &pid, double error) {
     pid.previous_error = error;
     return pid.Kp * error + pid.Ki * pid.integral + pid.Kd * derivative;
 }
-
-void release_camera() {
-    camera.release();
-}
-
-void stop_line_tracer_task() {
-    stp_cyc(LINE_TRACER_TASK_CYC);
-}
-
 
