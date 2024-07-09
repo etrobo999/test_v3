@@ -14,7 +14,7 @@ double pid_control(PID &pid, double error);
 static void Capture(void); 
 static void motor_cntrol(double left_motor_speed , double right_motor_speed);
 
-PID pid = {0.15, 0, 0, 0, 0}; 
+PID pid = {0.18, 0.01, 0.01, 0, 0}; 
 
 cv::VideoCapture camera;
 
@@ -103,8 +103,8 @@ static void Capture(void){
 /* 走行モータ制御 */
 static void motor_cntrol(double left_motor_speed , double right_motor_speed){
     // モータ速度を0から100の範囲に制限
-    left_motor_speed = std::min(left_motor_speed, 100.0);
-    right_motor_speed = std::min(right_motor_speed, 100.0);
+    left_motor_speed = std::max(std::min(left_motor_speed, 100.0), -100.0);
+    right_motor_speed = std::max(std::min(right_motor_speed, 100.0), -100.0);
 
     // 実際のモータ制御関数をここで呼び出す
     ev3_motor_set_power(left_motor, left_motor_speed);
