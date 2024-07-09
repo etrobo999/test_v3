@@ -8,7 +8,6 @@ extern "C" {
 
 /* 下記の項目は各ロボットに合わせて変えること */
 
-
 /* カラーセンサの輝度設定 */
 constexpr int WHITE_BRIGHTNESS = 180;
 constexpr int BLACK_BRIGHTNESS = 10;
@@ -30,11 +29,7 @@ constexpr int ALLB_Y2 = TRIMH;
 constexpr float STEERING_COEF = 0.2F;
 
 /* 走行基準スピード */
-constexpr int BASE_SPEED = 40;
-
-/* ライントレースエッジ切り替え */
-constexpr int LEFT_EDGE = -1;
-constexpr int RIGHT_EDGE = 1;
+constexpr double BASE_SPEED = 80;
 
 #ifdef __cplusplus
 }

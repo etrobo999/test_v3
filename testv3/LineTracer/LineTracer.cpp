@@ -17,22 +17,27 @@ static void motor_cntrol(double left_motor_speed , double right_motor_speed);
 
 PID pid = {0.1, 0, 0, 0, 0}; 
 
-/* ライントレースタスク(100msec周期で関数コールされる) */
+cv::VideoCapture camera;
+
+/* ライントレースタスク(50msec周期で関数コールされる) */
 void tracer_task(intptr_t unused) {
     Capture();
-
+    if (kbhit()) {
+        int ch = getch();
+        if (ch == 'q') {
+            release_camera() 
+            stop_line_tracer_task();
+        }
+    }
     /* タスク終了 */
     ext_tsk();
 }
 
 static void Capture(void){
-    cv::VideoCapture camera(0);
     int retry_count = 0;
-    int Lsensor_count = 0;
-    int Rsensor_count = 0;
     const int max_retries = 5;
     if (!camera.isOpened()) {
-        std::cerr << "Error: Camera could not be opened." << std::endl;
+        camera.open(0);
         return;
     }
     cv::Mat frame, hsv, mask, morphed;
@@ -45,13 +50,9 @@ static void Capture(void){
         }
         break;
     }
-
-    if (frame.empty()) {
-        std::cerr << "Error: Frame is empty after maximum retries." << std::endl;
-        return;
-    }
     /*std::cout << "Cols: " << frame.cols << ", Rows: " << frame.rows << std::endl;*/
     frame = frame(cv::Rect(140, TRIMY, 500, TRIMH));
+
     cv::cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
 
     // 特定の色範囲を検出（黒いラインを検出）
@@ -84,29 +85,27 @@ static void Capture(void){
         double error = frame_center - cX;
         double control = pid_control(pid, error);
 
-        double base_speed = 75;
-
         // フィードバック制御のためのモータ制御（仮想）
-        double left_motor_speed = base_speed - control;
-        double right_motor_speed = base_speed + control;
+        if (control > 0) {
+            double left_motor_speed = BASE_SPEED - control * 2;
+        } else if (control < 0) {
+            double right_motor_speed = BASE_SPEED + control * 2;
+        } else {
+            double left_motor_speed = BASE_SPEED - control;
+            double right_motor_speed = BASE_SPEED + control;
 
+        }
         // モータ速度を表示（実際のロボットではここでモータ制御関数を呼び出す）
         std::cout << "Left Motor: " << left_motor_speed << ", Right Motor: " << right_motor_speed << std::endl;
+        motor_cntrol(left_motor_speed , right_motor_speed);
+    
     }
 
-    motor_cntrol(left_motor_speed , right_motor_speed);
     cv::imshow("Frame", frame);
     cv::waitKey(1);
     camera.release();
     return;
-}
-
-
-double pid_control(PID &pid, double error) {
-    pid.integral += error;
-    double derivative = error - pid.previous_error;
-    pid.previous_error = error;
-    return pid.Kp * error + pid.Ki * pid.integral + pid.Kd * derivative;
+    
 }
 
 /* 走行モータ制御 */
@@ -118,5 +117,24 @@ static void motor_cntrol(double left_motor_speed , double right_motor_speed){
     // 実際のモータ制御関数をここで呼び出す
     ev3_motor_set_power(left_motor, left_motor_speed);
     ev3_motor_set_power(right_motor, right_motor_speed);
-        return;
+    return;
 }
+
+
+
+double pid_control(PID &pid, double error) {
+    pid.integral += error;
+    double derivative = error - pid.previous_error;
+    pid.previous_error = error;
+    return pid.Kp * error + pid.Ki * pid.integral + pid.Kd * derivative;
+}
+
+void release_camera() {
+    camera.release();
+}
+
+void stop_line_tracer_task() {
+    stp_cyc(LINE_TRACER_TASK_CYC);
+}
+
+
