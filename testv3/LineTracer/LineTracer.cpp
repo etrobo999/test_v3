@@ -14,7 +14,7 @@ double pid_control(PID &pid, double error);
 static void Capture(void); 
 static void motor_cntrol(double left_motor_speed , double right_motor_speed);
 
-PID pid = {0.1, 0, 0, 0, 0}; 
+PID pid = {0.15, 0, 0, 0, 0}; 
 
 cv::VideoCapture camera;
 
@@ -77,16 +77,16 @@ static void Capture(void){
         double error = frame_center - cX;
         double control = pid_control(pid, error);
         double BASE_SPEED = 80.0;
-        double left_motor_speed;
-        double right_motor_speed;
+        double left_motor_speed = BASE_SPEED;
+        double right_motor_speed = BASE_SPEED;
         // フィードバック制御のためのモータ制御（仮想）
         if (control > 0) {
-            left_motor_speed = BASE_SPEED + control * 2;
+            left_motor_speed += control * 2;
         } else if (control < 0) {
-            right_motor_speed = BASE_SPEED + control * 2;
+            right_motor_speed += control * 2;
         } else {
-            left_motor_speed = BASE_SPEED - control;
-            right_motor_speed = BASE_SPEED + control;
+            left_motor_speed -= control;
+            right_motor_speed += control;
 
         }
         // モータ速度を表示（実際のロボットではここでモータ制御関数を呼び出す）
