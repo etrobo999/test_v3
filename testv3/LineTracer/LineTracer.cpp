@@ -81,7 +81,7 @@ static void Capture(void){
         double right_motor_speed = BASE_SPEED;
         // フィードバック制御のためのモータ制御（仮想）
         if (control > 0) {
-            left_motor_speed += control * 2;
+            left_motor_speed -= control * 2;
         } else if (control < 0) {
             right_motor_speed += control * 2;
         } else {
